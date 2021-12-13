@@ -21,10 +21,10 @@
         <p id="contract-address">Address: <span></span></p>
       </div>
       <div class="col-12">
-        <button id="deploy" class="btn btn-primary my-1 hidden">Deploy</button>
+        <button id="deploy" class="btn btn-primary my-1 hidden"></button>
       </div>
       <div class="col-12">
-        <button id="deployed" class="btn btn-secondary my-1 hidden" disabled>Deployed</button>
+        <button id="connect" class="btn btn-primary my-1 hidden"></button>
       </div>
     </div>
   </div>
@@ -35,7 +35,11 @@
   <script src="/assets/js/jquery.ba-tinypubsub.min.js"></script>
   <!-- utils -->
   <script>
-    let states = ['deploy', 'deployed']
+    const states = {
+      deploy: 'deploy',
+      deployed: 'deployed',
+      connected: 'connected'
+    }
 
     $.subscribe('state', updateState)
 
@@ -43,18 +47,32 @@
       if(_state != null) localStorage.setItem('state', _state);
 
       const state = localStorage.getItem('state');
-      if(state == states[0]) {
-        $('#deploy').removeClass('hidden');
+      if(state == states.deploy) {
+        $('#deploy')
+          .removeClass('hidden')
+          .prop('disabled', false)
+          .text('Deploy');
         $('#contract-status span').text('-');
         $('#contract-address span').text('-');
       }
 
-      if(state == states[1]) {
+      if(state == states.deployed) {
         const contract = JSON.parse(localStorage.getItem('contract'));
-        $('#deploy').addClass('hidden')
-        $('#deployed').removeClass('hidden');
+        $('#deploy')
+          .removeClass(['btn-primary', 'hidden'])
+          .addClass('btn-secondary')
+          .prop('disabled', true)
+          .text('Deployed');
         $('#contract-status span').text('Deployed');
         $('#contract-address span').text(contract.address);
+        $('#connect')
+          .removeClass(['hidden'])
+          .prop('disabled', false)
+          .text('Connect');
+      }
+
+      if(state == states.connected) {
+        const contract = JSON.parse(localStorage.getItem('contract'));
       }
     }
   </script>
@@ -99,7 +117,7 @@
       const contract = factory.deploy()
         .then(function(result) {
           localStorage.setItem('contract', JSON.stringify(result));
-          $.publish("state", [states[1]]);
+          $.publish("state", [states.deployed]);
         });
     }
 
@@ -112,9 +130,9 @@
   <script>
     $(document).ready(function() {
       if(localStorage.getItem('contract')) {
-        return $.publish("state", [states[1]]);
+        return $.publish("state", [states.deployed]);
       }
-      return $.publish("state", [states[0]]);
+      return $.publish("state", [states.deploy]);
     })
 
   </script>
