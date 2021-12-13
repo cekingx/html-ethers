@@ -17,10 +17,14 @@
   <div class="container">
     <div class="row">
       <div class="col-12">
+        <p id="contract-status">Status: <span></span></p>
+        <p id="contract-address">Address: <span></span></p>
+      </div>
+      <div class="col-12">
         <button id="deploy" class="btn btn-primary my-1 hidden">Deploy</button>
       </div>
       <div class="col-12">
-        <button id="deployed" class="btn btn-primary my-1 hidden">Deployed</button>
+        <button id="deployed" class="btn btn-secondary my-1 hidden" disabled>Deployed</button>
       </div>
     </div>
   </div>
@@ -28,39 +32,87 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+  <!-- utils -->
   <script>
     let states = ['deploy', 'deployed']
 
     function updateState(toState) {
-      if(toState != null) localStorage.setItem('state', toState);
+      if(toState != null) window.localStorage.setItem('state', toState);
 
-      const state = localStorage.getItem('state');
+      const state = window.localStorage.getItem('state');
       if(state == states[0]) {
-        $('#deploy').removeClass('hidden')
+        $('#deploy').removeClass('hidden');
+        $('#contract-status span').text('-');
+        $('#contract-address span').text('-');
       }
 
       if(state == states[1]) {
-        $('#deployed').removeClass('hidden')
+        const contract = JSON.parse(window.localStorage.getItem('contract'));
         $('#deploy').addClass('hidden')
+        $('#deployed').removeClass('hidden');
+        $('#contract-status span').text('Deployed');
+        $('#contract-address span').text(contract.address);
       }
     }
   </script>
 
+  <!-- ethers -->
   <script type="module">
     import { ethers } from "/assets/js/ethers-5.2.esm.min.js";
-    // Your code here...
-    $('#deploy').click(function() {
-      updateState(states[1]);
-    });
 
-    $('#deployed').click(function() {
-      updateState();
-    })
+    const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+    const signer = provider.getSigner();
+    const abi = [
+      {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "inputs": [],
+        "name": "getVal",
+        "outputs": [
+          {
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "setFail",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      }
+    ]
+    const bytecode = "0x608060405234801561001057600080fd5b506100596040518060400160405280600981526020017f4465706c6f79696e67000000000000000000000000000000000000000000000081525061007860201b61014b1760201c565b60016000806101000a81548160ff0219169083151502179055506101fb565b6101148160405160240161008c9190610179565b6040516020818303038152906040527f41304fac000000000000000000000000000000000000000000000000000000007bffffffffffffffffffffffffffffffffffffffffffffffffffffffff19166020820180517bffffffffffffffffffffffffffffffffffffffffffffffffffffffff838183161783525050505061011760201b60201c565b50565b60008151905060006a636f6e736f6c652e6c6f679050602083016000808483855afa5050505050565b600061014b8261019b565b61015581856101a6565b93506101658185602086016101b7565b61016e816101ea565b840191505092915050565b600060208201905081810360008301526101938184610140565b905092915050565b600081519050919050565b600082825260208201905092915050565b60005b838110156101d55780820151818401526020810190506101ba565b838111156101e4576000848401525b50505050565b6000601f19601f8301169050919050565b6102fe8061020a6000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c80633c24328d1461003b578063e1cb0e5214610045575b600080fd5b610043610063565b005b61004d6100bd565b60405161005a9190610246565b60405180910390f35b6100a16040518060400160405280600e81526020017f53657420746f206661696c696e6700000000000000000000000000000000000081525061014b565b60008060006101000a81548160ff021916908315150217905550565b606060008054906101000a900460ff161561010f576040518060400160405280600781526020017f53756363657373000000000000000000000000000000000000000000000000008152509050610148565b6040518060400160405280600481526020017f4661696c0000000000000000000000000000000000000000000000000000000081525090505b90565b6101e18160405160240161015f9190610246565b6040516020818303038152906040527f41304fac000000000000000000000000000000000000000000000000000000007bffffffffffffffffffffffffffffffffffffffffffffffffffffffff19166020820180517bffffffffffffffffffffffffffffffffffffffffffffffffffffffff83818316178352505050506101e4565b50565b60008151905060006a636f6e736f6c652e6c6f679050602083016000808483855afa5050505050565b600061021882610268565b6102228185610273565b9350610232818560208601610284565b61023b816102b7565b840191505092915050565b60006020820190508181036000830152610260818461020d565b905092915050565b600081519050919050565b600082825260208201905092915050565b60005b838110156102a2578082015181840152602081019050610287565b838111156102b1576000848401525b50505050565b6000601f19601f830116905091905056fea26469706673582212207d61bbd2b8910cc4f06d0c76f25f421c676c4e1a629365d44d1fb2acaed77d8664736f6c63430008040033"
+
+    async function deploy() {
+      const factory = new ethers.ContractFactory(abi, bytecode, signer)
+      const contract = factory.deploy()
+        .then(function(result) {
+          window.localStorage.setItem('contract', JSON.stringify(result));
+          updateState(states[1]);
+        });
+    }
+
+    $('#deploy').click(function() {
+      deploy();
+    });
   </script>
 
+  <!-- event -->
   <script>
     $(document).ready(function() {
       updateState(states[0]);
+    })
+
+    $('#deployed').click(function() {
+      updateState();
     })
   </script>
 </body>
