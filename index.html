@@ -17,6 +17,7 @@
   <div class="container">
     <div class="row">
       <div class="col-12">
+        <h1>Mini Smart Contract</h1>
         <p id="contract-status">Status: <span></span></p>
         <p id="contract-address">Address: <span></span></p>
       </div>
@@ -25,6 +26,15 @@
       </div>
       <div class="col-12">
         <button id="connect" class="btn btn-primary my-1 hidden"></button>
+      </div>
+      <div class="col-12">
+        <button id="getval" class="btn btn-primary my-1 mr-1 hidden">Get Value</button>
+        <button id="setfail" class="btn btn-danger my-1 hidden">Set Fail</button>
+        <button id="clear" class="btn btn-secondary my-1 hidden">clear</button>
+      </div>
+      <div id="contract-message" class="col-12 hidden">
+        <p>Pesan:</p>
+        <h3></h3>
       </div>
     </div>
   </div>
@@ -38,7 +48,7 @@
     const states = {
       deploy: 'deploy',
       deployed: 'deployed',
-      connected: 'connected'
+      connected: 'connected',
     }
 
     $.subscribe('state', updateState)
@@ -79,6 +89,10 @@
           .prop('disabled', true)
           .text('Connected');
         $('#contract-status span').text('Connected');
+        $('#getval').removeClass('hidden');
+        $('#setfail').removeClass('hidden');
+        $('#clear').removeClass('hidden');
+        $('#contract-message').removeClass('hidden');
       }
     }
   </script>
@@ -140,11 +154,31 @@
       return contract.address;
     }
 
+    async function getVal() {
+      const message = await connectedContract.getVal();
+      console.log(message);
+      $('#contract-message h3').text(message);
+    }
+
+    async function setFail() {
+      const withSigner = connectedContract.connect(signer);
+      await withSigner.setFail();
+      const message = await connectedContract.getVal();
+      console.log(message);
+      $('#contract-message h3').text(message);
+    }
+
     $('#deploy').click(function() {
       deploy();
     });
     $('#connect').click(function() {
       connect();
+    });
+    $('#getval').click(function() {
+      getVal();
+    });
+    $('#setfail').click(function() {
+      setFail();
     });
   </script>
 
@@ -157,6 +191,9 @@
       return $.publish("state", [states.deploy]);
     })
 
+    $('#clear').click(function() {
+      $('#contract-message h3').text('');
+    });
   </script>
 </body>
 </html>
