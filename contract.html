@@ -16,24 +16,7 @@
   <div class="container">
     <div class="row">
       <div class="col-12">
-        <h1>Mini Smart Contract</h1>
-        <p id="contract-status">Status: <span></span></p>
-        <p id="contract-address">Address: <span></span></p>
-      </div>
-      <div class="col-12">
-        <button id="deploy" class="btn btn-primary my-1 hidden"></button>
-      </div>
-      <div class="col-12">
-        <button id="connect" class="btn btn-primary my-1 hidden"></button>
-      </div>
-      <div class="col-12">
-        <button id="getval" class="btn btn-primary my-1 mr-1 hidden">Get Value</button>
-        <button id="setfail" class="btn btn-danger my-1 hidden">Set Fail</button>
-        <button id="clear" class="btn btn-secondary my-1 hidden">clear</button>
-      </div>
-      <div id="contract-message" class="col-12 hidden">
-        <p>Pesan:</p>
-        <h3></h3>
+        <button class="btn btn-primary" id="populate-contract">Populate Contract</button>
       </div>
     </div>
   </div>
@@ -42,59 +25,6 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
   <script src="/assets/js/jquery.ba-tinypubsub.min.js"></script>
-  <!-- utils -->
-  <script>
-    const states = {
-      deploy: 'deploy',
-      deployed: 'deployed',
-      connected: 'connected',
-    }
-
-    $.subscribe('state', updateState)
-
-    function updateState(e, _state) {
-      if(_state != null) localStorage.setItem('state', _state);
-
-      const state = localStorage.getItem('state');
-      if(state == states.deploy) {
-        $('#deploy')
-          .removeClass('hidden')
-          .prop('disabled', false)
-          .text('Deploy');
-        $('#contract-status span').text('-');
-        $('#contract-address span').text('-');
-      }
-
-      if(state == states.deployed) {
-        const contract = JSON.parse(localStorage.getItem('contract'));
-        $('#deploy')
-          .removeClass(['btn-primary', 'hidden'])
-          .addClass('btn-secondary')
-          .prop('disabled', true)
-          .text('Deployed');
-        $('#contract-status span').text('Deployed');
-        $('#contract-address span').text(contract.address);
-        $('#connect')
-          .removeClass(['hidden'])
-          .prop('disabled', false)
-          .text('Connect');
-      }
-
-      if(state == states.connected) {
-        const contract = JSON.parse(localStorage.getItem('contract'));
-        $('#connect')
-          .removeClass(['btn-primary', 'hidden'])
-          .addClass('btn-secondary')
-          .prop('disabled', true)
-          .text('Connected');
-        $('#contract-status span').text('Connected');
-        $('#getval').removeClass('hidden');
-        $('#setfail').removeClass('hidden');
-        $('#clear').removeClass('hidden');
-        $('#contract-message').removeClass('hidden');
-      }
-    }
-  </script>
 
   <!-- ethers -->
   <script type="module">
@@ -133,20 +63,12 @@
     const bytecode = "0x608060405234801561001057600080fd5b506100596040518060400160405280600981526020017f4465706c6f79696e67000000000000000000000000000000000000000000000081525061007860201b61014b1760201c565b60016000806101000a81548160ff0219169083151502179055506101fb565b6101148160405160240161008c9190610179565b6040516020818303038152906040527f41304fac000000000000000000000000000000000000000000000000000000007bffffffffffffffffffffffffffffffffffffffffffffffffffffffff19166020820180517bffffffffffffffffffffffffffffffffffffffffffffffffffffffff838183161783525050505061011760201b60201c565b50565b60008151905060006a636f6e736f6c652e6c6f679050602083016000808483855afa5050505050565b600061014b8261019b565b61015581856101a6565b93506101658185602086016101b7565b61016e816101ea565b840191505092915050565b600060208201905081810360008301526101938184610140565b905092915050565b600081519050919050565b600082825260208201905092915050565b60005b838110156101d55780820151818401526020810190506101ba565b838111156101e4576000848401525b50505050565b6000601f19601f8301169050919050565b6102fe8061020a6000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c80633c24328d1461003b578063e1cb0e5214610045575b600080fd5b610043610063565b005b61004d6100bd565b60405161005a9190610246565b60405180910390f35b6100a16040518060400160405280600e81526020017f53657420746f206661696c696e6700000000000000000000000000000000000081525061014b565b60008060006101000a81548160ff021916908315150217905550565b606060008054906101000a900460ff161561010f576040518060400160405280600781526020017f53756363657373000000000000000000000000000000000000000000000000008152509050610148565b6040518060400160405280600481526020017f4661696c0000000000000000000000000000000000000000000000000000000081525090505b90565b6101e18160405160240161015f9190610246565b6040516020818303038152906040527f41304fac000000000000000000000000000000000000000000000000000000007bffffffffffffffffffffffffffffffffffffffffffffffffffffffff19166020820180517bffffffffffffffffffffffffffffffffffffffffffffffffffffffff83818316178352505050506101e4565b50565b60008151905060006a636f6e736f6c652e6c6f679050602083016000808483855afa5050505050565b600061021882610268565b6102228185610273565b9350610232818560208601610284565b61023b816102b7565b840191505092915050565b60006020820190508181036000830152610260818461020d565b905092915050565b600081519050919050565b600082825260208201905092915050565b60005b838110156102a2578082015181840152602081019050610287565b838111156102b1576000848401525b50505050565b6000601f19601f830116905091905056fea26469706673582212207d61bbd2b8910cc4f06d0c76f25f421c676c4e1a629365d44d1fb2acaed77d8664736f6c63430008040033"
     let connectedContract = null;
 
-    async function deploy() {
-      const factory = new ethers.ContractFactory(abi, bytecode, signer)
-      const contract = factory.deploy()
-        .then(function(result) {
-          localStorage.setItem('contract', JSON.stringify(result));
-          $.publish("state", [states.deployed]);
-        });
-    }
-
-    async function connect() {
+    async function populateContract() {
       const address = getContractAddress();
       const contract = new ethers.Contract(address, abi, provider);
       connectedContract = contract;
-      $.publish("state", [states.connected]);
+      const result = await connectedContract.populateTransaction.setFail();
+      console.log(result);
     }
 
     function getContractAddress() {
@@ -154,47 +76,10 @@
       return contract.address;
     }
 
-    async function getVal() {
-      const message = await connectedContract.getVal();
-      console.log(message);
-      $('#contract-message h3').text(message);
-    }
-
-    async function setFail() {
-      signer.unlock("password");
-      const withSigner = connectedContract.connect(signer);
-      await withSigner.setFail();
-      const message = await connectedContract.getVal();
-      console.log(message);
-      $('#contract-message h3').text(message);
-    }
-
-    $('#deploy').click(function() {
-      deploy();
-    });
-    $('#connect').click(function() {
-      connect();
-    });
-    $('#getval').click(function() {
-      getVal();
-    });
-    $('#setfail').click(function() {
-      setFail();
+    $('#populate-contract').click(function() {
+      populateContract();
     });
   </script>
 
-  <!-- event -->
-  <script>
-    $(document).ready(function() {
-      if(localStorage.getItem('contract')) {
-        return $.publish("state", [states.deployed]);
-      }
-      return $.publish("state", [states.deploy]);
-    })
-
-    $('#clear').click(function() {
-      $('#contract-message h3').text('');
-    });
-  </script>
 </body>
 </html>

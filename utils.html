@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Utils</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <button class="btn btn-primary" id="get-signer">Get Signer</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+  <script src="/assets/js/jquery.ba-tinypubsub.min.js"></script>
+
+  <!-- ethers -->
+  <script type="module">
+    import { ethers } from "/assets/js/ethers-5.2.esm.min.js";
+
+    const provider = new ethers.providers.JsonRpcProvider('http://localhost:8540');
+    const signer = provider.getSigner("0x004ec07d2329997267ec62b4166639513386f32e");
+    signer.unlock("password");
+
+    $('#get-signer').click(function() {
+      console.log(signer);
+    });
+  </script>
+</body>
+</html>
