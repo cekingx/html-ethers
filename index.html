@@ -35,7 +35,7 @@
       </div>
       <div id="contract-message" class="col-12 hidden">
         <p>Pesan:</p>
-        <h3></h3>
+        <div id="message" class="row"></div>
       </div>
     </div>
   </div>
@@ -44,6 +44,8 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
   <script src="/assets/js/jquery.ba-tinypubsub.min.js"></script>
+  <script src="/assets/js/moment-with-locales.min.js"></script>
+  <script src="/assets/js/moment-timezone-with-data-10-year-range.min.js"></script>
   <!-- utils -->
   <script>
     const states = {
@@ -165,8 +167,8 @@
 
     async function getPerson() {
       const message = await connectedContract.getPerson();
-      console.log(message);
-      $('#contract-message h3').text(message);
+      const text = moment().tz('Asia/Makassar').locale('id').format('d MMM YYYY hh:mm:ss') + ' | ' + message
+      $('#message').append(`<p>${text}</p><br/>`);
     }
 
     async function setPerson(name) {
