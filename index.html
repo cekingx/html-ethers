@@ -173,8 +173,12 @@
 
     async function setPerson(name) {
       signer.unlock("password");
-      const withSigner = connectedContract.connect(signer);
-      await withSigner.setPerson(name);
+      try {
+        const withSigner = connectedContract.connect(signer);
+        await withSigner.setPerson(name);
+      } catch (error) {
+        alert(error.message)
+      }
       const message = await connectedContract.getPerson();
       console.log(message);
       $('#contract-message h3').text(message);
